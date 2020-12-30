@@ -1,1 +1,1 @@
-g++ -o 15Puzzle -Wall -std=c++17 src/main.cpp
+g++ -o 15Puzzle -Wall -std=c++17 src/*.cpp
