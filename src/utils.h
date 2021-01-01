@@ -7,6 +7,8 @@
 // returns the index of the blank square in the state array
 int getBlankIndex(int arr[]);
 
+int totalManhattan(const int arr[]);
+
 // Expand node by adding available moves from that state to
 // given frontier list
 // return the count of new nodes added to frontier list

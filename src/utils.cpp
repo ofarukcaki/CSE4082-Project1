@@ -5,12 +5,49 @@
 #include <string>
 #include <unordered_map>
 
+// x-y coordinates of each tile from 0 to 15
+// real board coordinates
+int locations[16][2] = {
+    {1, 2}, // location of blank tile
+    {0, 0}, // location of tile 1
+    {1, 0}, // location of tile 2
+    {2, 0},
+    {3, 0},
+    {3, 1},
+    {3, 2},
+    {3, 3}, // location of tile 7
+    {2, 3},
+    {1, 3},
+    {0, 3}, // location of tile 10
+    {0, 2},
+    {0, 1},
+    {1, 1},
+    {2, 1},
+    {2, 2}, // location of tile 15
+};
+
 int getBlankIndex(int arr[]) {
     return std::distance(arr, std::find(arr, arr + 16, 0));
 }
 
 int Manhattan(int x1, int y1, int x2, int y2) {
     return std::abs(x2 - x1) + abs(y2 - y1);
+}
+
+int totalManhattan(const int arr[]) {
+    int total = 0; // total Manhattan distance of all tiles to their original locations
+    for (int i = 0; i < 16; i++) {
+        // convert current index to 2d coordinates
+        int x = i / 4;
+        int y = i % 4;
+
+        int value = arr[i];
+        // printf("Valuer: %d  x: %d,  y: %d\n", value, x, y);
+        int distance = Manhattan(x, y, locations[value][0], locations[value][1]);
+        // std::cout << "dist: " << distance << "\n";
+        total += distance;
+    }
+    return total;
 }
 
 void printTable(const int arr[]) {
@@ -184,7 +221,7 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* bottom right */
-    if (!(index == 4 || index == 7 || index == 11 || index == 12 || index == 13 || index == 14 || index == 15)) {
+    if (!(index == 3 || index == 7 || index == 11 || index == 12 || index == 13 || index == 14 || index == 15)) {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::DOWN_RIGHT, node->depth + 1, node->cost + 3);
 

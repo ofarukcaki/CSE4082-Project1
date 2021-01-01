@@ -80,6 +80,10 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
         // yeni node'lar vektörün sonuna eklendiği için vektörün arkaasından aramaya başlayabiliriz
         // yeni expand edilen node'lar arasında eğer bir önceki costtan daha düşük olan var onu expand ederiz
 
+        // TODO: node'un costu yeterince büyükse h1 hesaplamaya gerek yok, skip edilebilir
+        if (x->cost > smallest)
+            continue;
+
         // calculate h1 value
         int misplaced = 0;
         for (int i = 0; i < 16; i++) {
@@ -90,6 +94,34 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
         if ((x->cost + misplaced) < smallest) {
             // smallest so far
             smallest = x->cost + misplaced;
+            smallestIndex = index;
+        }
+        // printf("Misplaced: %d  Cost: %d   Total: %d\n", misplaced, x->cost, x->cost + misplaced);
+        index++;
+    }
+    // printf("Smallest index: %d  Smallest val: %d\n", smallestIndex, smallest);
+
+    return smallestIndex;
+}
+
+int h2(const std::vector<Node *> &frontier, const int goalState[], int newNodes, Node *current) {
+    // Node which has smallest cost + estimated cost
+    // Node *smallestNode;
+    int index = 0;
+    int smallestIndex = 0;
+    int smallest = std::numeric_limits<int>::max();
+
+    // iterate over frontier to find smalles cost
+    for (const auto &x : frontier) {
+        if (x->cost > smallest)
+            continue;
+
+        // get h2 value
+        int manhattan_dist = totalManhattan(x->state);
+
+        if ((x->cost + manhattan_dist) < smallest) {
+            // smallest so far
+            smallest = x->cost + manhattan_dist;
             smallestIndex = index;
         }
         // printf("Misplaced: %d  Cost: %d   Total: %d\n", misplaced, x->cost, x->cost + misplaced);
@@ -122,6 +154,7 @@ std::vector<Direction> A_star_search(const int startingState[], const int goalSt
 
     while (true) {
         // index of the frontier list element to be expanded
+        // int index = h1(frontier, goalState, newNodes, current);
         int index = h1(frontier, goalState, newNodes, current);
 
         // select the current(to be expanded) node based returned index from h1
@@ -150,17 +183,16 @@ std::vector<Direction> A_star_search(const int startingState[], const int goalSt
 
     // printTable(startingState);
 
+    printf("\nCost of solution: %d\n", current->cost);
+    printf("Total  Expanded: %d\n", expanded);
+    printf("Max # of nodes stored in memory: %d\n", maxNodes + 1);
+
     // until first node
     while (current->parentMove != 8) {
         // printTable(current->state);
         std::cout << current->parentMove << " ";
         current = current->parentNode;
     }
-
-    printf("\nCost of solution: %d\n", current->cost);
-    printf("Total  Expanded: %d\n", expanded);
-    printf("Max # of nodes stored in memory: %d\n", maxNodes + 1);
-
     // TODO: construct the path after finding the solution and return
     std::vector<Direction>
         path = {Direction::UP};
