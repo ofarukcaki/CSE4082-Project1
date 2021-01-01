@@ -10,7 +10,9 @@ enum Direction { UP,
                  UP_LEFT,
                  UP_RIGHT,
                  DOWN_LEFT,
-                 DOWN_RIGHT };
+                 DOWN_RIGHT,
+                 None // for the root node
+};
 
 class Node {
 public:
@@ -21,7 +23,7 @@ public:
     Node *parentNode;          // Pointer to the node which created this node
 
     // Constructor
-    Node(int state[], Node *parentNode, enum Direction parentMove, int depth, int cost) {
+    Node(const int state[], Node *parentNode, enum Direction parentMove, int depth, int cost) {
         std::copy(state, state + 16, this->state); // copy the state array
         this->parentMove = parentMove;
         this->depth = depth;
@@ -32,6 +34,14 @@ public:
     // Destructor
     ~Node() {
         //
+        // printf("Destructor called\n");
+        // printf("Class object going to be destructed: [%d, %d, %d...]\n", this->state[0], this->state[1], this->state[2]);
+    }
+
+    // whether it's a goal state or not
+    bool isGoal(const int goalState[]) {
+        // compare state array with the goal state
+        return std::equal(this->state, this->state + 16, goalState);
     }
 };
 
