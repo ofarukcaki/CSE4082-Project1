@@ -9,7 +9,8 @@ int getBlankIndex(int arr[]);
 
 // Expand node by adding available moves from that state to
 // given frontier list
-void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node);
+// return the count of new nodes added to frontier list
+int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node);
 
 // function to return Manhattan distance between two points
 int Manhattan(int x1, int y1, int x2, int y2);

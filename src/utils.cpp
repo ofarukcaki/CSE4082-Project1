@@ -75,7 +75,7 @@ void addExpanded(std::unordered_map<std::string, bool> &map, int state[]) {
     map.insert(std::pair<std::string, bool>(convertStateString(state), true));
 }
 
-void addIfNotExpanded(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node) {
+void addIfNotExpanded(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int &count) {
 
     if (isExpanded(map, node->state)) {
         // already expanded
@@ -85,11 +85,13 @@ void addIfNotExpanded(std::unordered_map<std::string, bool> &map, std::vector<No
         frontier.push_back(node);
         // add to expanded list
         addExpanded(map, node->state);
+        count++;
     }
 }
 
-void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node) {
+int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node) {
     int index = getBlankIndex(node->state);
+    int expandedCount = 0;
 
     /* up */
     if (!(index == 0 || index == 4 || index == 8 || index == 12)) {
@@ -100,7 +102,7 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index] = newNode->state[index - 1];
         newNode->state[index - 1] = 0;
 
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
 
     /* down */
@@ -113,7 +115,7 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index + 1] = 0;
 
         // add new node to frontier list
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
 
     /* left */
@@ -126,7 +128,7 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index - 4] = 0;
 
         // add new node to frontier list
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
 
     /* right */
@@ -139,7 +141,7 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index + 4] = 0;
 
         // add new node to frontier list
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
 
     /* top left */
@@ -152,7 +154,7 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index - 5] = 0;
 
         // add new node to frontier list
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
 
     /* top right */
@@ -165,7 +167,7 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index + 3] = 0;
 
         // add new node to frontier list
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
 
     /* bottom left */
@@ -178,7 +180,7 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index - 3] = 0;
 
         // add new node to frontier list
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
 
     /* bottom right */
@@ -191,8 +193,10 @@ void expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *>
         newNode->state[index + 5] = 0;
 
         // add new node to frontier list
-        addIfNotExpanded(map, frontier, newNode);
+        addIfNotExpanded(map, frontier, newNode, expandedCount);
     }
+
+    return expandedCount;
 }
 
 void printExpandedList(std::unordered_map<std::string, bool> &expandedList) {
