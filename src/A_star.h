@@ -3,7 +3,7 @@
 #include "main.h"
 
 // returns the path to solution from starting state to goal state
-std::vector<Direction> A_star_search(const int startingState[], const int goalState[]);
+void A_star_search(const int startingState[], const int goalState[], int heuristic);
 // std::vector<Direction> A_star_search(int a, int b);
 
 #endif

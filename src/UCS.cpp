@@ -77,14 +77,20 @@ void UCS(const int startingState[], const int goalState[]) {
     // printTable(startingState);
 
     printf("\nCost of solution: %d\n", current->cost);
-    printf("Total  Expanded: %d\n", expanded);
+    printf("Total  Expanded: %d\n", expanded + 1); // +1 for the parent
     printf("Max # of nodes stored in memory: %d\n", maxNodes + 1);
+
+    std::vector<int> path;
+
+    printTable(current->state);
 
     // until first node
     while (current->parentMove != 8) {
         // printTable(current->state);
-        std::cout << current->parentMove << " ";
+        // std::cout << current->parentMove << " ";
+        path.push_back(current->parentMove);
         current = current->parentNode;
     }
-    // TODO: construct the path after finding the solution and return
+
+    printPath(path);
 }

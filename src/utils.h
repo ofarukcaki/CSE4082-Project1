@@ -47,4 +47,6 @@ void printExpandedList(std::unordered_map<std::string, bool> &expandedList);
 // to be used for debugging purposed
 void debugNode(const Node &node);
 
+void printPath(std::vector<int> path);
+
 #endif

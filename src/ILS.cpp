@@ -66,15 +66,22 @@ bool ILS(const int startingState[], const int goalState[], int limit) {
             std::cout << "*** Goal State Reached ***" << std::endl;
 
             printf("\nCost of solution: %d\n", current->cost);
-            printf("Total  Expanded: %d\n", expanded);
+            printf("Total  Expanded: %d\n", expanded + 1); // +1 for the parent
             printf("Max # of nodes stored in memory: %d\n", maxNodes + 1);
+
+            std::vector<int> path;
+
+            printTable(current->state);
 
             // until first node
             while (current->parentMove != 8) {
                 // printTable(current->state);
-                std::cout << current->parentMove << " ";
+                // std::cout << current->parentMove << " ";
+                path.push_back(current->parentMove);
                 current = current->parentNode;
             }
+
+            printPath(path);
 
             return true; // exit while loop
         } else {
@@ -95,7 +102,6 @@ void ILS_master(const int startingState[], const int goalState[]) {
     bool found = false; // goal state found or not
 
     while (found == false) {
-        printf("Limit: %d\n", limit);
         found = ILS(startingState, goalState, limit);
         limit++;
     }
