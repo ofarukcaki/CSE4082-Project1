@@ -26,9 +26,9 @@ int main() {
 
     time_t start = time(0); // start time
     // UCS(case_2, goal_state);
-    std::vector<Direction> path = A_star_search(case_3, goal_state);
+    // std::vector<Direction> path = A_star_search(case_3, goal_state);
 
-    // ILS_master(case_2, goal_state);
+    ILS_master(case_2, goal_state);
 
     // print time took
     double seconds_since_start = difftime(time(0), start);

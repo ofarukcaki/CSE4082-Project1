@@ -9,6 +9,8 @@ int getBlankIndex(int arr[]);
 
 int totalManhattan(const int arr[]);
 
+int totalH3_dist(const int arr[]);
+
 // Expand node by adding available moves from that state to
 // given frontier list
 // return the count of new nodes added to frontier list

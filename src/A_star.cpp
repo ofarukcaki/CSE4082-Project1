@@ -7,10 +7,13 @@
 
 int prevCost = std::numeric_limits<int>::max();
 
-int getMisplacedCount(const int state[], const int goalState[]) {
+int getMisplacedCount(const int state[], const int goalState[])
+{
     int mis = 0;
-    for (int i = 0; i < 16; i++) {
-        if (state[i] != goalState[i]) {
+    for (int i = 0; i < 16; i++)
+    {
+        if (state[i] != goalState[i])
+        {
             mis = mis + 1;
         }
     }
@@ -18,7 +21,8 @@ int getMisplacedCount(const int state[], const int goalState[]) {
 }
 
 // Will return the index to be expanded next on frontier list
-int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes, Node *current) {
+int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes, Node *current)
+{
     // Node which has smallest cost + estimated cost
     // Node *smallestNode;
     int index = 0;
@@ -71,7 +75,8 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
     }
 */
     // iterate over frontier to find smalles cost
-    for (const auto &x : frontier) {
+    for (const auto &x : frontier)
+    {
         // TODO: Frontier list büyüdükçe en küçük costu bulmak için en sona kadar gitmek(yeni eklenenler için) çok uzun sürebilir
         // yeni node'lar vektörün sonuna eklendiği için vektörün arkaasından aramaya başlayabiliriz
         // yeni expand edilen node'lar arasında eğer bir önceki costtan daha düşük olan var onu expand ederiz
@@ -100,7 +105,8 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
         //     std::exit(0);
         // }
 
-        if ((x->cost + misplaced) < smallest) {
+        if ((x->cost + misplaced) < smallest)
+        {
             // smallest so far
             smallest = (x->cost + misplaced);
             smallestIndex = index;
@@ -108,13 +114,15 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
         // printf("Misplaced: %d  Cost: %d   Total: %d\n", misplaced, x->cost, x->cost + misplaced);
         index++;
     }
-    if (smallest > 25) {
+    if (smallest > 25)
+    {
         printf("Smallest index: %d  Smallest val: %d \n", smallestIndex, smallest);
     }
     return smallestIndex;
 }
 
-int h2(const std::vector<Node *> &frontier, const int goalState[], int newNodes, Node *current) {
+int h2(const std::vector<Node *> &frontier, const int goalState[], int newNodes, Node *current)
+{
     // Node which has smallest cost + estimated cost
     // Node *smallestNode;
     int index = 0;
@@ -122,14 +130,16 @@ int h2(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
     int smallest = std::numeric_limits<int>::max();
 
     // iterate over frontier to find smalles cost
-    for (const auto &x : frontier) {
+    for (const auto &x : frontier)
+    {
         if (x->cost > smallest)
             continue;
 
         // get h2 value
         int manhattan_dist = totalManhattan(x->state);
 
-        if ((x->cost + manhattan_dist) < smallest) {
+        if ((x->cost + manhattan_dist) < smallest)
+        {
             // smallest so far
             smallest = x->cost + manhattan_dist;
             smallestIndex = index;
@@ -142,7 +152,39 @@ int h2(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
     return smallestIndex;
 }
 
-std::vector<Direction> A_star_search(const int startingState[], const int goalState[]) {
+int h3(const std::vector<Node *> &frontier, const int goalState[], int newNodes, Node *current)
+{
+    // Node which has smallest cost + estimated cost
+    // Node *smallestNode;
+    int index = 0;
+    int smallestIndex = 0;
+    int smallest = std::numeric_limits<int>::max();
+
+    // iterate over frontier to find smalles cost
+    for (const auto &x : frontier)
+    {
+        if (x->cost > smallest)
+            continue;
+
+        // get h2 value
+        int manhattan_dist = totalH3_dist(x->state);
+
+        if ((x->cost + manhattan_dist) < smallest)
+        {
+            // smallest so far
+            smallest = x->cost + manhattan_dist;
+            smallestIndex = index;
+        }
+        // printf("Misplaced: %d  Cost: %d   Total: %d\n", misplaced, x->cost, x->cost + misplaced);
+        index++;
+    }
+    // printf("Smallest index: %d  Smallest val: %d\n", smallestIndex, smallest);
+
+    return smallestIndex;
+}
+
+std::vector<Direction> A_star_search(const int startingState[], const int goalState[])
+{
     // // std::vector<Direction> A_star_search(int a, int b) {
     int expanded = 0;             // # of expanded nodes
     int maxNodes = 0;             // # of nodes stored in memory
@@ -162,10 +204,11 @@ std::vector<Direction> A_star_search(const int startingState[], const int goalSt
     frontier.push_back(startNode);
     Node *current = frontier.front(); // get the root node without removing from frontier list(yet)
 
-    while (true) {
+    while (true)
+    {
         // index of the frontier list element to be expanded
         // int index = h1(frontier, goalState, newNodes, current);
-        int index = h1(frontier, goalState, newNodes, current);
+        int index = h3(frontier, goalState, newNodes, current);
 
         // select the current(to be expanded) node based returned index from h1
         current = frontier[index];
@@ -177,10 +220,13 @@ std::vector<Direction> A_star_search(const int startingState[], const int goalSt
         maxNodes += newNodes; // newly expanded nodes minus last deleted node
         // printf("Expanded: %d\n", newNodes);
 
-        if (current->isGoal(goalState)) {
+        if (current->isGoal(goalState))
+        {
             std::cout << "*** Goal State Reached ***" << std::endl;
             break; // exit while loop
-        } else {
+        }
+        else
+        {
             // not a goal state
         }
 
@@ -199,7 +245,8 @@ std::vector<Direction> A_star_search(const int startingState[], const int goalSt
 
     printTable(current->state);
     // until first node
-    while (current->parentMove != 8) {
+    while (current->parentMove != 8)
+    {
         // printTable(current->state);
         std::cout << current->parentMove << " ";
         current = current->parentNode;

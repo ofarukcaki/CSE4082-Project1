@@ -26,17 +26,21 @@ int locations[16][2] = {
     {2, 2}, // location of tile 15
 };
 
-int getBlankIndex(int arr[]) {
+int getBlankIndex(int arr[])
+{
     return std::distance(arr, std::find(arr, arr + 16, 0));
 }
 
-int Manhattan(int x1, int y1, int x2, int y2) {
+int Manhattan(int x1, int y1, int x2, int y2)
+{
     return std::abs(x2 - x1) + abs(y2 - y1);
 }
 
-int totalManhattan(const int arr[]) {
+int totalManhattan(const int arr[])
+{
     int total = 0; // total Manhattan distance of all tiles to their original locations
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++)
+    {
         // convert current index to 2d coordinates
         int x = i / 4;
         int y = i % 4;
@@ -50,7 +54,42 @@ int totalManhattan(const int arr[]) {
     return total;
 }
 
-void printTable(const int arr[]) {
+// calculate h3 distance
+int h3_dist(int x1, int y1, int x2, int y2)
+{
+    int dx = std::abs(x1 - x2);
+    int dy = std::abs(y1 - y2);
+
+    int diff = std::abs(dx - dy);
+
+    int min = dx > dy ? dy : dx;
+    int max = min == dx ? dy : dx;
+
+    int remaining = max - min;
+
+    return (3 * min + remaining);
+}
+
+int totalH3_dist(const int arr[])
+{
+    int total = 0; // total Manhattan distance of all tiles to their original locations
+    for (int i = 0; i < 16; i++)
+    {
+        // convert current index to 2d coordinates
+        int x = i / 4;
+        int y = i % 4;
+
+        int value = arr[i];
+        // printf("Valuer: %d  x: %d,  y: %d\n", value, x, y);
+        int distance = h3_dist(x, y, locations[value][0], locations[value][1]);
+        // std::cout << "dist: " << distance << "\n";
+        total += distance;
+    }
+    return total;
+}
+
+void printTable(const int arr[])
+{
     printf("-----------------------------\n");
     printf("|  %2d  |  %2d  |  %2d  |  %2d  |\n", arr[0], arr[4], arr[8], arr[12]);
     printf("-----------------------------\n");
@@ -62,19 +101,24 @@ void printTable(const int arr[]) {
     printf("-----------------------------\n");
 }
 
-void printFrontierListTables(const std::vector<Node *> frontier) {
+void printFrontierListTables(const std::vector<Node *> frontier)
+{
     std::cout << "Frontier list: [ \n";
-    for (const auto node : frontier) {
+    for (const auto node : frontier)
+    {
         printTable(node->state);
     }
     std::cout << "]\n";
 }
 
-void printFrontierList(const std::vector<Node *> frontier) {
+void printFrontierList(const std::vector<Node *> frontier)
+{
     std::cout << "Frontier list: [ \n";
-    for (const auto node : frontier) {
+    for (const auto node : frontier)
+    {
         std::cout << "\t[ ";
-        for (const auto x : node->state) {
+        for (const auto x : node->state)
+        {
             std::cout << x << ", ";
         }
         std::cout << "\b\b ],\n";
@@ -82,51 +126,62 @@ void printFrontierList(const std::vector<Node *> frontier) {
     std::cout << "]\n";
 }
 
-void printFrontierListCosts(const std::vector<Node *> frontier) {
+void printFrontierListCosts(const std::vector<Node *> frontier)
+{
 
-    for (const auto node : frontier) {
+    for (const auto node : frontier)
+    {
         std::cout << node->cost << " ";
     }
     std::cout << "\n\n\n";
 }
 
-std::string convertStateString(const int state[]) {
+std::string convertStateString(const int state[])
+{
     char codes[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     // prepare the string equivalent of the array
     // converts all values to hex characters
     std::string str = "0000000000000000";
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++)
+    {
         str[i] = codes[state[i]];
     }
     // std::cout << "_" << str << "_\n";
     return str;
 }
 
-bool isExpanded(std::unordered_map<std::string, bool> &map, int state[]) {
+bool isExpanded(std::unordered_map<std::string, bool> &map, int state[])
+{
     std::string str = "0000000000000000";
 
     const auto it = map.find(convertStateString(state));
     // const auto it = map.find(str);
 
-    if (it == map.end()) {
+    if (it == map.end())
+    {
         return false; // not found
     }
     // std::cout << "=" << it->first << "=\n";
     return true; // found: already expanded before
 }
 
-void addExpanded(std::unordered_map<std::string, bool> &map, int state[]) {
+void addExpanded(std::unordered_map<std::string, bool> &map, int state[])
+{
     // convert state array to equivalent string and add to expanded list
     map.insert(std::pair<std::string, bool>(convertStateString(state), true));
 }
 
-void addIfNotExpanded(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int &count) {
+void addIfNotExpanded(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int &count)
+{
 
     // is explored?
-    if (isExpanded(map, node->state)) {
+    if (isExpanded(map, node->state))
+    {
         // already expanded
         delete node;
-    } else {
+    }
+    else
+    {
         // add new node to frontier list
         frontier.push_back(node);
         // add to expanded list
@@ -135,12 +190,14 @@ void addIfNotExpanded(std::unordered_map<std::string, bool> &map, std::vector<No
     }
 }
 
-int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node) {
+int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node)
+{
     int index = getBlankIndex(node->state);
     int expandedCount = 0;
 
     /* up */
-    if (!(index == 0 || index == 4 || index == 8 || index == 12)) {
+    if (!(index == 0 || index == 4 || index == 8 || index == 12))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::UP, node->depth + 1, node->cost + 1);
 
@@ -152,7 +209,8 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* down */
-    if (!(index == 3 || index == 7 || index == 11 || index == 15)) {
+    if (!(index == 3 || index == 7 || index == 11 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::DOWN, node->depth + 1, node->cost + 1);
 
@@ -165,7 +223,8 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* left */
-    if (!(index == 0 || index == 1 || index == 2 || index == 3)) {
+    if (!(index == 0 || index == 1 || index == 2 || index == 3))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::LEFT, node->depth + 1, node->cost + 1);
 
@@ -178,7 +237,8 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* right */
-    if (!(index == 12 || index == 13 || index == 14 || index == 15)) {
+    if (!(index == 12 || index == 13 || index == 14 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::RIGHT, node->depth + 1, node->cost + 1);
 
@@ -191,7 +251,8 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* top left */
-    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 8 || index == 12)) {
+    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 8 || index == 12))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::UP_LEFT, node->depth + 1, node->cost + 3);
 
@@ -204,7 +265,8 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* top right */
-    if (!(index == 0 || index == 4 || index == 8 || index == 12 || index == 13 || index == 14 || index == 15)) {
+    if (!(index == 0 || index == 4 || index == 8 || index == 12 || index == 13 || index == 14 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::UP_RIGHT, node->depth + 1, node->cost + 3);
 
@@ -217,7 +279,8 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* bottom left */
-    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 7 || index == 11 || index == 15)) {
+    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 7 || index == 11 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::DOWN_LEFT, node->depth + 1, node->cost + 3);
 
@@ -230,7 +293,8 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     }
 
     /* bottom right */
-    if (!(index == 3 || index == 7 || index == 11 || index == 12 || index == 13 || index == 14 || index == 15)) {
+    if (!(index == 3 || index == 7 || index == 11 || index == 12 || index == 13 || index == 14 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::DOWN_RIGHT, node->depth + 1, node->cost + 3);
 
@@ -245,16 +309,19 @@ int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> 
     return expandedCount;
 }
 
-void printExpandedList(std::unordered_map<std::string, bool> &expandedList) {
+void printExpandedList(std::unordered_map<std::string, bool> &expandedList)
+{
     std::cout << "===== Expanded List =====\n";
-    for (auto &it : expandedList) {
+    for (auto &it : expandedList)
+    {
         // Do stuff
         std::cout << it.first << std::endl;
     }
     std::cout << "=========================\n";
 }
 
-void debugNode(const Node &node) {
+void debugNode(const Node &node)
+{
     printf("============== NODE INFO ==============\n");
     printTable(node.state);
     printf("Parent move: %d\n", node.parentMove);
@@ -263,12 +330,16 @@ void debugNode(const Node &node) {
     printf("================= END =================\n");
 }
 
-void addIfNotExpanded_ils(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int &count, int limit) {
+void addIfNotExpanded_ils(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int &count, int limit)
+{
     // is explored?
-    if (isExpanded(map, node->state) || node->cost > limit) {
+    if (isExpanded(map, node->state) || node->cost > limit)
+    {
         // already expanded
         delete node;
-    } else {
+    }
+    else
+    {
         // add new node to frontier list
         frontier.push_back(node);
         // add to expanded list
@@ -277,12 +348,14 @@ void addIfNotExpanded_ils(std::unordered_map<std::string, bool> &map, std::vecto
     }
 }
 
-int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int limit) {
+int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int limit)
+{
     int index = getBlankIndex(node->state);
     int expandedCount = 0;
 
     /* up */
-    if (!(index == 0 || index == 4 || index == 8 || index == 12)) {
+    if (!(index == 0 || index == 4 || index == 8 || index == 12))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::UP, node->depth + 1, node->cost + 1);
 
@@ -294,7 +367,8 @@ int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node
     }
 
     /* down */
-    if (!(index == 3 || index == 7 || index == 11 || index == 15)) {
+    if (!(index == 3 || index == 7 || index == 11 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::DOWN, node->depth + 1, node->cost + 1);
 
@@ -307,7 +381,8 @@ int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node
     }
 
     /* left */
-    if (!(index == 0 || index == 1 || index == 2 || index == 3)) {
+    if (!(index == 0 || index == 1 || index == 2 || index == 3))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::LEFT, node->depth + 1, node->cost + 1);
 
@@ -320,7 +395,8 @@ int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node
     }
 
     /* right */
-    if (!(index == 12 || index == 13 || index == 14 || index == 15)) {
+    if (!(index == 12 || index == 13 || index == 14 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::RIGHT, node->depth + 1, node->cost + 1);
 
@@ -333,7 +409,8 @@ int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node
     }
 
     /* top left */
-    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 8 || index == 12)) {
+    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 8 || index == 12))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::UP_LEFT, node->depth + 1, node->cost + 3);
 
@@ -346,7 +423,8 @@ int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node
     }
 
     /* top right */
-    if (!(index == 0 || index == 4 || index == 8 || index == 12 || index == 13 || index == 14 || index == 15)) {
+    if (!(index == 0 || index == 4 || index == 8 || index == 12 || index == 13 || index == 14 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::UP_RIGHT, node->depth + 1, node->cost + 3);
 
@@ -359,7 +437,8 @@ int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node
     }
 
     /* bottom left */
-    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 7 || index == 11 || index == 15)) {
+    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 7 || index == 11 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::DOWN_LEFT, node->depth + 1, node->cost + 3);
 
@@ -372,7 +451,8 @@ int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node
     }
 
     /* bottom right */
-    if (!(index == 3 || index == 7 || index == 11 || index == 12 || index == 13 || index == 14 || index == 15)) {
+    if (!(index == 3 || index == 7 || index == 11 || index == 12 || index == 13 || index == 14 || index == 15))
+    {
         // clone the node and swap blank tile
         Node *newNode = new Node(node->state, node, Direction::DOWN_RIGHT, node->depth + 1, node->cost + 3);
 
