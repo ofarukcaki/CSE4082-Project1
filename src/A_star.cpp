@@ -7,6 +7,16 @@
 
 int prevCost = std::numeric_limits<int>::max();
 
+int getMisplacedCount(const int state[], const int goalState[]) {
+    int mis = 0;
+    for (int i = 0; i < 16; i++) {
+        if (state[i] != goalState[i]) {
+            mis = mis + 1;
+        }
+    }
+    return mis;
+}
+
 // Will return the index to be expanded next on frontier list
 int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes, Node *current) {
     // Node which has smallest cost + estimated cost
@@ -14,7 +24,7 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
     int index = 0;
     int smallestIndex = 0;
     int smallest = std::numeric_limits<int>::max();
-
+    /*
     // Extra optimization 🚀
     int frontierLength = frontier.size();
     if (frontierLength != 0) {
@@ -55,25 +65,11 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
 
         if (smallest_child_cost < parentCost) {
             // printf("[NEW_ADDED]Smallest index: %d  smallest cost: %d\n", smallest_child_inner_index, smallest_child_cost);
-            // printf("parent cost: %d\n", parentCost);
-            // for (int i = 0; i < newNodes; i++) {
-            //     Node *temp = frontier[frontierLength - 1 - i];
-            //     int misplaced_inner = 0;
-            //     for (int j = 0; j < 16; j++) {
-            //         if (temp->state[j] != goalState[j])
-            //             misplaced_inner++;
-            //     }
-
-            //     int child_total_cost = temp->cost + misplaced_inner;
-
-            //     printf(">> [%d] %d  total: %d\n", frontierLength - 1 - i, temp->cost, child_total_cost);
-            // }
-            // std::exit(0);
             // smaller cost node is available among new added nodes, return it's index
             return smallest_child_inner_index;
         }
     }
-
+*/
     // iterate over frontier to find smalles cost
     for (const auto &x : frontier) {
         // TODO: Frontier list büyüdükçe en küçük costu bulmak için en sona kadar gitmek(yeni eklenenler için) çok uzun sürebilir
@@ -81,26 +77,40 @@ int h1(const std::vector<Node *> &frontier, const int goalState[], int newNodes,
         // yeni expand edilen node'lar arasında eğer bir önceki costtan daha düşük olan var onu expand ederiz
 
         // TODO: node'un costu yeterince büyükse h1 hesaplamaya gerek yok, skip edilebilir
-        if (x->cost > smallest)
-            continue;
+        // if (x->cost > smallest)
+        //     continue;
 
         // calculate h1 value
-        int misplaced = 0;
-        for (int i = 0; i < 16; i++) {
-            if (x->state[i] != goalState[i])
-                misplaced++;
+        // misplaced = 0;
+        // for (int i = 0; i < 16; i++) {
+        //     if (x->state[i] != goalState[i])
+        //         misplaced++;
+        // }
+        int misplaced = getMisplacedCount(x->state, goalState);
+
+        /*
+        // printf("Mispalced: %d\n", misplaced);
+        if (misplaced == 0) {
+            std::cout << "MISPLACED IS 0!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+            // std::exit(0);
         }
+*/
+        // if (x->isGoal(goalState)) {
+        //     std::cout << "GOALSTATE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+        //     std::exit(0);
+        // }
 
         if ((x->cost + misplaced) < smallest) {
             // smallest so far
-            smallest = x->cost + misplaced;
+            smallest = (x->cost + misplaced);
             smallestIndex = index;
         }
         // printf("Misplaced: %d  Cost: %d   Total: %d\n", misplaced, x->cost, x->cost + misplaced);
         index++;
     }
-    // printf("Smallest index: %d  Smallest val: %d\n", smallestIndex, smallest);
-
+    if (smallest > 25) {
+        printf("Smallest index: %d  Smallest val: %d \n", smallestIndex, smallest);
+    }
     return smallestIndex;
 }
 
@@ -187,12 +197,14 @@ std::vector<Direction> A_star_search(const int startingState[], const int goalSt
     printf("Total  Expanded: %d\n", expanded);
     printf("Max # of nodes stored in memory: %d\n", maxNodes + 1);
 
+    printTable(current->state);
     // until first node
     while (current->parentMove != 8) {
         // printTable(current->state);
         std::cout << current->parentMove << " ";
         current = current->parentNode;
     }
+
     // TODO: construct the path after finding the solution and return
     std::vector<Direction>
         path = {Direction::UP};

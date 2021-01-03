@@ -82,6 +82,14 @@ void printFrontierList(const std::vector<Node *> frontier) {
     std::cout << "]\n";
 }
 
+void printFrontierListCosts(const std::vector<Node *> frontier) {
+
+    for (const auto node : frontier) {
+        std::cout << node->cost << " ";
+    }
+    std::cout << "\n\n\n";
+}
+
 std::string convertStateString(const int state[]) {
     char codes[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     // prepare the string equivalent of the array
@@ -114,6 +122,7 @@ void addExpanded(std::unordered_map<std::string, bool> &map, int state[]) {
 
 void addIfNotExpanded(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int &count) {
 
+    // is explored?
     if (isExpanded(map, node->state)) {
         // already expanded
         delete node;
@@ -252,4 +261,128 @@ void debugNode(const Node &node) {
     printf("Depth: %d\n", node.depth);
     printf("Cost: %d\n", node.cost);
     printf("================= END =================\n");
+}
+
+void addIfNotExpanded_ils(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int &count, int limit) {
+    // is explored?
+    if (isExpanded(map, node->state) || node->cost > limit) {
+        // already expanded
+        delete node;
+    } else {
+        // add new node to frontier list
+        frontier.push_back(node);
+        // add to expanded list
+        addExpanded(map, node->state);
+        count++;
+    }
+}
+
+int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int limit) {
+    int index = getBlankIndex(node->state);
+    int expandedCount = 0;
+
+    /* up */
+    if (!(index == 0 || index == 4 || index == 8 || index == 12)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::UP, node->depth + 1, node->cost + 1);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index - 1];
+        newNode->state[index - 1] = 0;
+
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    /* down */
+    if (!(index == 3 || index == 7 || index == 11 || index == 15)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::DOWN, node->depth + 1, node->cost + 1);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index + 1];
+        newNode->state[index + 1] = 0;
+
+        // add new node to frontier list
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    /* left */
+    if (!(index == 0 || index == 1 || index == 2 || index == 3)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::LEFT, node->depth + 1, node->cost + 1);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index - 4];
+        newNode->state[index - 4] = 0;
+
+        // add new node to frontier list
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    /* right */
+    if (!(index == 12 || index == 13 || index == 14 || index == 15)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::RIGHT, node->depth + 1, node->cost + 1);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index + 4];
+        newNode->state[index + 4] = 0;
+
+        // add new node to frontier list
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    /* top left */
+    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 4 || index == 8 || index == 12)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::UP_LEFT, node->depth + 1, node->cost + 3);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index - 5];
+        newNode->state[index - 5] = 0;
+
+        // add new node to frontier list
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    /* top right */
+    if (!(index == 0 || index == 4 || index == 8 || index == 12 || index == 13 || index == 14 || index == 15)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::UP_RIGHT, node->depth + 1, node->cost + 3);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index + 3];
+        newNode->state[index + 3] = 0;
+
+        // add new node to frontier list
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    /* bottom left */
+    if (!(index == 0 || index == 1 || index == 2 || index == 3 || index == 7 || index == 11 || index == 15)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::DOWN_LEFT, node->depth + 1, node->cost + 3);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index - 3];
+        newNode->state[index - 3] = 0;
+
+        // add new node to frontier list
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    /* bottom right */
+    if (!(index == 3 || index == 7 || index == 11 || index == 12 || index == 13 || index == 14 || index == 15)) {
+        // clone the node and swap blank tile
+        Node *newNode = new Node(node->state, node, Direction::DOWN_RIGHT, node->depth + 1, node->cost + 3);
+
+        // slide blank tile
+        newNode->state[index] = newNode->state[index + 5];
+        newNode->state[index + 5] = 0;
+
+        // add new node to frontier list
+        addIfNotExpanded_ils(map, frontier, newNode, expandedCount, limit);
+    }
+
+    return expandedCount;
 }

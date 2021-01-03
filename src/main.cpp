@@ -1,5 +1,7 @@
 #include "main.h"
 #include "A_star.h"
+#include "ILS.h"
+#include "UCS.h"
 #include "utils.h"
 #include <time.h>
 
@@ -23,12 +25,25 @@ int main() {
     // std::exit(0);
 
     time_t start = time(0); // start time
-
+    // UCS(case_2, goal_state);
     std::vector<Direction> path = A_star_search(case_3, goal_state);
+
+    // ILS_master(case_2, goal_state);
 
     // print time took
     double seconds_since_start = difftime(time(0), start);
     std::cout << "Time passed: " << seconds_since_start << std::endl;
+
+    // int misplaced = 0;
+    // for (int i = 0; i < 16; i++) {
+    //     if (goal_state[i] != goal_state[i])
+    //         misplaced++;
+    // }
+
+    // // printTable(case_3);
+    // printTable(goal_state);
+
+    // printf("Misplaced: %d\n", misplaced);
 
     return 0;
 };

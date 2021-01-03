@@ -14,6 +14,9 @@ int totalManhattan(const int arr[]);
 // return the count of new nodes added to frontier list
 int expand_node(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node);
 
+// expand function for ILS
+int expand_node_ils(std::unordered_map<std::string, bool> &map, std::vector<Node *> &frontier, Node *node, int limit);
+
 // function to return Manhattan distance between two points
 int Manhattan(int x1, int y1, int x2, int y2);
 
@@ -24,6 +27,8 @@ void printFrontierListTables(const std::vector<Node *> frontier);
 
 // same as the func. above, but prints array instead
 void printFrontierList(const std::vector<Node *> frontier);
+
+void printFrontierListCosts(const std::vector<Node *> frontier);
 
 // converts state array to string equivalent
 std::string convertStateString(const int state[]);
